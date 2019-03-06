@@ -1,5 +1,5 @@
 <?php 
-  include("setup.php");
+  include("init.php");
   echo('[');
   $result = mysqli_query($con,"SELECT * from clothes ORDER BY location, type;");
   $first = true;

@@ -5,7 +5,7 @@ const LOC_NAME_MAP = {
   "wash" : "In the wash"
 };
 
-let dropdown = null;
+const DROPDOWN_OPTS = [];
 
 /** Some handy helpers */
 const showEl = (el) => {
@@ -15,16 +15,25 @@ const hideEl = (el) => {
   el.classList.add('hide');
 };
 const resetAll = () => {
-  // Show everythng but hide dropdown and screen
+  // Show everythng but hide dropdowns
   document.querySelectorAll('.hide').forEach(showEl);
-  hideEl(document.querySelector('.screen'));
-  hideEl(dropdown);
+  document.querySelectorAll('.dropdown').forEach(hideEl);
+};
+
+const createDropdown = () => {
+  const dropdown = document.createElement('select');
+  dropdown.classList.add('dropdown');
+  dropdown.addEventListener('change', handleSelectChange);
+  DROPDOWN_OPTS.forEach((loc) => {
+    dropdown.options.add(new Option(loc, loc));
+  });
+  return dropdown;
 }
 
 const setup = () => {
   fetch('./list.php')
     .then(response => response.json())
-    .then(data => updatePage(data))
+    .then(data => initialSetup(data))
     .catch(error => console.error(error));
 };
 
@@ -32,7 +41,10 @@ const createNewSection = (el, title) => {
   const det = document.createElement('details');
 
   const summary = document.createElement('summary');
-  summary.innerText = LOC_NAME_MAP[title];
+  if (LOC_NAME_MAP[title]) {
+    title = LOC_NAME_MAP[title];
+  }
+  summary.innerText = title;
   det.appendChild(summary);
   
   const list = document.createElement('ul');
@@ -41,20 +53,6 @@ const createNewSection = (el, title) => {
   el.appendChild(det);
 
   return list;
-};
-
-const handleItemClick = (e) => {
-  resetAll();
-  if (dropdown === null) {
-    return;
-  }
-  hideEl(e.target);
-
-  dropdown.value = e.target.parentElement.getAttribute('loc');
-
-  e.target.parentElement.appendChild(dropdown);
-  showEl(dropdown);
-  showEl(document.querySelector('.screen'));
 };
 
 const handleSelectChange = (e) => {
@@ -72,30 +70,35 @@ const handleSelectChange = (e) => {
 
 const createAndAddItem = (section, item) => {
   const listItem = document.createElement('li');
+  listItem.classList.add('itemContainer');
   const innerDiv = document.createElement('div');
   innerDiv.innerHTML = item.name;
-  innerDiv.addEventListener('click', handleItemClick);
+  innerDiv.classList.add('itemname');
   listItem.setAttribute('dbid', item.id);
   listItem.setAttribute('loc', item.location);
   listItem.appendChild(innerDiv);
+  const dd = createDropdown();
+  dd.value = item.location;
+  listItem.appendChild(dd);
   section.appendChild(listItem);
 };
 
-const updatePage = (data) => {
+const initialSetup = (data) => {
   const dataEl = document.createElement('div');
   dataEl.classList.add('data');
 
-  // Also set this up as we go
-  dropdown = document.createElement('select');
-  dropdown.classList.add('dropdown');
-  dropdown.addEventListener('change', handleSelectChange);
+  // First run through and find every location
+  // Note: SQL could do this for me...
+  const locs = [...new Set(data.map(item => item.location))];
+  locs.forEach((loc) => {
+    DROPDOWN_OPTS.push(loc);
+  })
 
-  let curloc = "";
+  curloc = "";
   let cursection = null;
   data.forEach((item) => {
     if (item.location !== curloc) {
       curloc = item.location;
-      dropdown.options.add(new Option(curloc, curloc));
       cursection = createNewSection(dataEl, curloc);
     }
     createAndAddItem(cursection, item);
@@ -104,11 +107,6 @@ const updatePage = (data) => {
   const mainEl = document.querySelector('.main');
   mainEl.removeChild(mainEl.children[0]);
   mainEl.appendChild(dataEl);
-
-  // Screen shows up to listen for non-dropdown clicks. When it's hit, 
-  // show everything except hide dropdown and itself
-  document.querySelector('.screen').addEventListener('click', resetAll);
-
   mainEl.classList.remove('dim');
 };
 

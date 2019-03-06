@@ -7,19 +7,6 @@ const LOC_NAME_MAP = {
 
 const DROPDOWN_OPTS = [];
 
-/** Some handy helpers */
-const showEl = (el) => {
-  el.classList.remove('hide');
-};
-const hideEl = (el) => {
-  el.classList.add('hide');
-};
-const resetAll = () => {
-  // Show everythng but hide dropdowns
-  document.querySelectorAll('.hide').forEach(showEl);
-  document.querySelectorAll('.dropdown').forEach(hideEl);
-};
-
 const createDropdown = () => {
   const dropdown = document.createElement('select');
   dropdown.classList.add('dropdown');
@@ -39,6 +26,7 @@ const setup = () => {
 
 const createNewSection = (el, title) => {
   const det = document.createElement('details');
+  det.classList.add(title);
 
   const summary = document.createElement('summary');
   if (LOC_NAME_MAP[title]) {
@@ -56,15 +44,18 @@ const createNewSection = (el, title) => {
 };
 
 const handleSelectChange = (e) => {
-  resetAll();
   document.querySelector('.main').classList.add('dim');
 
-  const id = e.target.parentElement.getAttribute('dbid');
+  const li = e.target.parentElement;
+  const id = li.getAttribute('dbid');
   fetch(`./update.php?id=${id}&location=${e.target.value}`)
-    .then(setup)
+    .then(() => {
+      li.parentElement.removeChild(li);
+      document.querySelector(`details.${e.target.value} ul`).appendChild(li);
+      document.querySelector('.main').classList.remove('dim');
+    })
     .catch((error) => {
       console.error(error);
-      resetAll();
     });
 };
 

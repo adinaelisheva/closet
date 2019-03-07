@@ -27,6 +27,7 @@ const setup = () => {
 const createNewSection = (el, title) => {
   const det = document.createElement('details');
   det.classList.add(title);
+  det.classList.add('category');
 
   const summary = document.createElement('summary');
   if (LOC_NAME_MAP[title]) {

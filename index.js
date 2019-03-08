@@ -1,17 +1,10 @@
-const LOC_NAME_MAP = {
-  "work" : "At work",
-  "home" : "At home",
-  "climbing" : "In climbing bag",
-  "wash" : "In the wash"
-};
-
-const DROPDOWN_OPTS = [];
+let dropdownOpts;
 
 const createDropdown = () => {
   const dropdown = document.createElement('select');
   dropdown.classList.add('dropdown');
   dropdown.addEventListener('change', handleSelectChange);
-  DROPDOWN_OPTS.forEach((loc) => {
+  dropdownOpts.forEach((loc) => {
     dropdown.options.add(new Option(loc, loc));
   });
   return dropdown;
@@ -30,8 +23,8 @@ const createNewSection = (el, title) => {
   det.classList.add('category');
 
   const summary = document.createElement('summary');
-  if (LOC_NAME_MAP[title]) {
-    title = LOC_NAME_MAP[title];
+  if (config.LOC_NAME_MAP && config.LOC_NAME_MAP[title]) {
+    title = config.LOC_NAME_MAP[title];
   }
   summary.innerText = title;
   det.appendChild(summary);
@@ -81,11 +74,9 @@ const initialSetup = (data) => {
 
   // First run through and find every location
   // Note: SQL could do this for me...
-  const locs = [...new Set(data.map(item => item.location))];
-  locs.forEach((loc) => {
-    DROPDOWN_OPTS.push(loc);
-  })
-
+  const start = config.DEFAULT_LOCS ? config.DEFAULT_LOCS : [];
+  dropdownOpts = [...new Set(start.concat(data.map(item => item.location)))];
+  
   curloc = "";
   let cursection = null;
   data.forEach((item) => {

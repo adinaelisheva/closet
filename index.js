@@ -72,17 +72,25 @@ const initialSetup = (data) => {
   const dataEl = document.createElement('div');
   dataEl.classList.add('data');
 
-  // First run through and find every location
-  // Note: SQL could do this for me...
-  const start = config.DEFAULT_LOCS ? config.DEFAULT_LOCS : [];
-  dropdownOpts = [...new Set(start.concat(data.map(item => item.location)))];
+  // First make sections for each default location
+  const startingLocs = config.DEFAULT_LOCS ? config.DEFAULT_LOCS : [];
+  startingLocs.forEach((loc) => {
+    createNewSection(dataEl, loc);
+  });
   
+  // Also run through and find every location, for use in the dropdown
+  dropdownOpts = [...new Set(startingLocs.concat(data.map(item => item.location)))];
+
+  // Finally populate these sections, making new ones as needed.
   curloc = "";
   let cursection = null;
   data.forEach((item) => {
     if (item.location !== curloc) {
       curloc = item.location;
-      cursection = createNewSection(dataEl, curloc);
+      cursection = dataEl.querySelector(`details.${curloc} ul`);
+      if (!cursection){
+        cursection = createNewSection(dataEl, curloc);
+      }
     }
     createAndAddItem(cursection, item);
   });

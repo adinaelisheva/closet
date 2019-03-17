@@ -56,14 +56,27 @@ const handleSelectChange = (e) => {
 const createAndAddItem = (section, item) => {
   const listItem = document.createElement('li');
   listItem.classList.add('itemContainer');
+
+  const outerDiv = document.createElement('div');
+  outerDiv.classList.add('itemnameContainer');
+
+  const img = document.createElement('img');
+  img.setAttribute('src',`${item.filename}.png`);
+  img.classList.add('itemimg');
+  outerDiv.appendChild(img);
+
   const innerDiv = document.createElement('div');
   innerDiv.innerHTML = item.name;
   innerDiv.classList.add('itemname');
+  outerDiv.appendChild(innerDiv);
+
   listItem.setAttribute('dbid', item.id);
   listItem.setAttribute('loc', item.location);
-  listItem.appendChild(innerDiv);
+  listItem.appendChild(outerDiv);
+
   const dd = createDropdown();
   dd.value = item.location;
+
   listItem.appendChild(dd);
   section.appendChild(listItem);
 };

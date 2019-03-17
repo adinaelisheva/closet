@@ -15,6 +15,8 @@
     echo($row['id']);
     echo('","type":"');
     echo($row['type']);
+    echo('","filename":"');
+    echo($row['image_filename']);
     echo('","location":"');
     echo($row['location']);
     echo('"}');

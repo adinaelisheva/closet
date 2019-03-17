@@ -22,6 +22,10 @@ ul {
   margin: 10px 0;
 }
 
+summary:focus {
+    outline: none;
+}
+
 .itemContainer {
   position: relative;
 }

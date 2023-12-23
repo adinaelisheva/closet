@@ -1,17 +1,18 @@
 body {
-  background: #bae2ea;
+  background: #aec8cb;
 }
 
 .main {
-  width: calc(100% - 40px);
-  height: calc(100% - 40px);
+  width: calc(100% - 60px);
+  min-height: calc(100% - 40px);
+  height: fit-content;
   font-family: sans-serif;
   font-size: 28px;
   color: #012144;
-  border: 3px solid #80808030;
+  background: #bae2ea;
   border-radius: 10px;
-  margin: 10px;
-  padding: 10px;
+  margin: 0 10px;
+  padding: 20px;
 }
 
 .hide {
@@ -39,6 +40,13 @@ summary:focus {
   top: 0;
   white-space: nowrap;
   display: flex;
+  max-width: 100%;
+}
+
+.itemname {
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .itemimg {

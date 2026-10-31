@@ -1,6 +1,29 @@
 let dropdownOpts;
 
-const createDropdown = () => {
+function updateTopBar() {
+  for (const loc of Object.keys(config.VITAL_LOC_EMOJI_MAP)) {
+    const container = document.querySelector(`.${loc}`);
+    let emojiStr = config.VITAL_LOC_EMOJI_MAP[loc];
+    let minRemaining = 2;
+    for (const type of Object.keys(config.VITAL_TYPE_EMOJI_MAP)) {
+      const isSingleton = config.SINGLETON_TYPE_LIST.indexOf(type) >= 0;
+      const count = container.querySelectorAll(`.${type}`).length;
+      if (!count || count >= 2 || (count && isSingleton)) {
+        continue;
+      }
+      emojiStr += config.VITAL_TYPE_EMOJI_MAP[type];
+      if (minRemaining > count) { minRemaining = count; }
+    }
+    if (minRemaining === 2) {
+      // This area is fine
+      continue;
+    }
+    const color = minRemaining === 0 ? '#ba2709' : '#d9ab07';
+    postToTopbar(`gym${loc}`, emojiStr, color, 'gymcloset');
+  }  
+}
+
+function createDropdown() {
   const dropdown = document.createElement('select');
   dropdown.classList.add('dropdown');
   dropdown.addEventListener('change', handleSelectChange);
@@ -10,14 +33,14 @@ const createDropdown = () => {
   return dropdown;
 }
 
-const setup = () => {
-  fetch('./list.php')
-    .then(response => response.json())
-    .then(data => initialSetup(data))
-    .catch(error => console.error(error));
+async function setup() {
+  const response = await fetch('./list.php');
+  const data =  await response.json();
+  initialSetup(data);
+  updateTopBar();
 };
 
-const createNewSection = (el, title) => {
+function createNewSection(el, title) {
   const det = document.createElement('details');
   det.classList.add(title);
   det.classList.add('category');
@@ -37,27 +60,24 @@ const createNewSection = (el, title) => {
   return list;
 };
 
-const handleSelectChange = (e) => {
+async function handleSelectChange(e) {
   document.querySelector('.main').classList.add('dim');
 
   const li = e.target.parentElement;
   const id = li.getAttribute('dbid');
-  fetch(`./update.php?id=${id}&location=${e.target.value}`)
-    .then(() => {
-      li.parentElement.removeChild(li);
-      document.querySelector(`details.${e.target.value} ul`).appendChild(li);
-      document.querySelector('.main').classList.remove('dim');
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  await fetch(`./update.php?id=${id}&location=${e.target.value}`)
+  li.parentElement.removeChild(li);
+  document.querySelector(`details.${e.target.value} ul`).appendChild(li);
+  document.querySelector('.main').classList.remove('dim');
+  updateTopBar();
 };
 
-const createAndAddItem = (section, item) => {
+function createAndAddItem(section, item) {
   const listItem = document.createElement('li');
   listItem.classList.add('itemContainer');
 
   const outerDiv = document.createElement('div');
+  outerDiv.classList.add(item.type);
   outerDiv.classList.add('itemnameContainer');
 
   const img = document.createElement('img');
@@ -81,7 +101,7 @@ const createAndAddItem = (section, item) => {
   section.appendChild(listItem);
 };
 
-const initialSetup = (data) => {
+function initialSetup(data) {
   const dataEl = document.createElement('div');
   dataEl.classList.add('data');
 

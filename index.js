@@ -15,11 +15,12 @@ function updateTopBar() {
       if (minRemaining > count) { minRemaining = count; }
     }
     if (minRemaining === 2) {
-      // This area is fine
-      continue;
+      // This area is fine - clear the topbar
+      postToTopbar(`gym${loc}`);
+    } else {
+      const color = minRemaining === 0 ? '#ba2709' : '#d9ab07';
+      postToTopbar(`gym${loc}`, emojiStr, color, 'gymcloset');
     }
-    const color = minRemaining === 0 ? '#ba2709' : '#d9ab07';
-    postToTopbar(`gym${loc}`, emojiStr, color, 'gymcloset');
   }  
 }
 

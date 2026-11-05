@@ -7,8 +7,8 @@ function updateTopBar() {
     let minRemaining = 2;
     for (const type of Object.keys(config.VITAL_TYPE_EMOJI_MAP)) {
       const isSingleton = config.SINGLETON_TYPE_LIST.indexOf(type) >= 0;
-      const count = container.querySelectorAll(`.${type}`).length;
-      if (!count || count >= 2 || (count && isSingleton)) {
+      const count = container.querySelectorAll(`.${type}`).length ?? 0;
+      if (count >= 2 || (count && isSingleton)) {
         continue;
       }
       emojiStr += config.VITAL_TYPE_EMOJI_MAP[type];
